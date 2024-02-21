@@ -1,3 +1,5 @@
+import { WebSocket } from "ws";
+
 export enum MESSAGE_TYPE {
   REG = "reg",
   CREATE_GAME = "create_game",
@@ -115,3 +117,9 @@ export interface Turn {
 export interface Finish {
   winPlayer: number;
 }
+
+export type Handler<T> = (
+  data: T,
+  ws: WebSocket,
+  clients: Set<WebSocket>,
+) => void | Promise<void>;
