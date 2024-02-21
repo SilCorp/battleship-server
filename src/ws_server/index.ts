@@ -3,7 +3,7 @@ import { createServer } from "node:http";
 import { MESSAGE_TYPE } from "./types";
 import { parseEntireMessage } from "./helpers/message";
 import { isCredentials } from "./guards/isCredentials";
-import { logRequest } from "./helpers/logger";
+import { logRequest, logResponse } from "./helpers/logger";
 import { handleUser } from "./handlers/handleUser";
 
 export const wsServer = createServer();
@@ -25,7 +25,9 @@ wss.on("connection", (ws) => {
       }
       // eslint-disable-next-line no-fallthrough
       default: {
-        console.error("Incorrect message");
+        const errorMessage = "Incorrect message";
+        ws.send(errorMessage);
+        console.log(errorMessage);
       }
     }
   });
