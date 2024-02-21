@@ -1,36 +1,31 @@
 import { WebSocketServer } from "ws";
 import { createServer } from "node:http";
-import { CreatedUser, Message, MESSAGE_TYPE } from "./types";
-import { createMessageStringified } from "./helpers/message";
+import { MESSAGE_TYPE } from "./types";
+import { parseEntireMessage } from "./helpers/message";
 import { isCredentials } from "./guards/isCredentials";
-import { logRequest, logResponse } from "./helpers/logger";
+import { logRequest } from "./helpers/logger";
+import { handleUser } from "./handlers/handleUser";
 
 export const wsServer = createServer();
 
-const wss = new WebSocketServer({ server: wsServer });
+const wss = new WebSocketServer({ server: wsServer, clientTracking: true });
 
 wss.on("connection", (ws) => {
   ws.on("message", (request) => logRequest(request));
-  ws.on("message", (rawMessage) => {
-    const parsedMessage: Message = JSON.parse(rawMessage.toString());
+  ws.on("message", async (rawMessage) => {
+    const parsedMessage = parseEntireMessage(rawMessage.toString());
     const { type, data } = parsedMessage;
-    const parsedData: unknown = JSON.parse(data);
 
     switch (type) {
       case MESSAGE_TYPE.REG: {
-        if (isCredentials(parsedData)) {
-          const { name } = parsedData;
-          const responseData: CreatedUser = {
-            name,
-            index: 123,
-            error: false,
-            errorText: "",
-          };
-          const response = createMessageStringified(type, responseData);
-          ws.send(response);
-          logResponse(response);
+        if (isCredentials(data)) {
+          await handleUser(data, ws, wss.clients);
+          break;
         }
-        break;
+      }
+      // eslint-disable-next-line no-fallthrough
+      default: {
+        console.error("Incorrect message");
       }
     }
   });
