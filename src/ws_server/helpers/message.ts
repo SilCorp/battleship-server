@@ -1,4 +1,4 @@
-import { Message, MESSAGE_TYPE } from "../types";
+import { Message, MESSAGE_TYPE, MessageParsed } from "../types";
 
 function createMessage<T>(type: MESSAGE_TYPE, data: T, id = 0): Message {
   return {
@@ -14,10 +14,10 @@ function createMessageStringified(...params: Parameters<typeof createMessage>) {
   return JSON.stringify(message);
 }
 
-function parseEntireMessage(message: string) {
+function parseEntireMessage(message: string): MessageParsed<unknown> {
   const parsedMessage: Message = JSON.parse(message);
   const { data } = parsedMessage;
-  const parsedData = JSON.parse(data);
+  const parsedData = parseMessageData(data);
 
   return {
     ...parsedMessage,
@@ -25,4 +25,13 @@ function parseEntireMessage(message: string) {
   };
 }
 
-export { createMessage, createMessageStringified, parseEntireMessage };
+function parseMessageData(data: string) {
+  return data === "" ? data : JSON.parse(data);
+}
+
+export {
+  createMessage,
+  createMessageStringified,
+  parseEntireMessage,
+  parseMessageData,
+};
