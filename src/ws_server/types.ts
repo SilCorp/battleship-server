@@ -21,6 +21,12 @@ export interface Message {
   id: number;
 }
 
+export interface MessageParsed<T> {
+  type: MESSAGE_TYPE;
+  data: T;
+  id: number;
+}
+
 export interface Credentials {
   name: string;
   password: string;
