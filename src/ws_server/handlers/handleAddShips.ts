@@ -1,7 +1,15 @@
-import { PlayerBoard, Handler, GameStart, MESSAGE_TYPE } from "../types";
+import {
+  PlayerBoard,
+  Handler,
+  GameStart,
+  MESSAGE_TYPE,
+  Clients,
+} from "../types";
 import { gameSessionsMap } from "../storages/gameSessionsMap";
 import { getUserConnectionByIndex } from "../helpers/getUserConnectionByIndex";
 import { createMessageStringified } from "../helpers/message";
+import { WebSocket } from "ws";
+import { logResponse } from "../helpers/logger";
 
 const handleAddShips: Handler<PlayerBoard> = (data) => {
   const { gameId } = data;
@@ -36,6 +44,18 @@ function startGame(gameId: number) {
     );
     playersConnections[index].send(message);
   });
+
+  turn(playersId[0], playersConnections);
+}
+
+function turn(playerIndex: number, clients: WebSocket[]) {
+  const message = createMessageStringified(MESSAGE_TYPE.TURN, {
+    currentPlayer: playerIndex,
+  });
+
+  clients.forEach((client) => client.send(message));
+
+  logResponse(message);
 }
 
 export { handleAddShips };
