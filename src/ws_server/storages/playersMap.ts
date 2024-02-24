@@ -1,6 +1,6 @@
 import { WebSocket } from "ws";
 
-type PlayersMap = WeakMap<WebSocket, number>;
-const playersMap: PlayersMap = new WeakMap();
+type PlayersMap = Map<WebSocket, number>;
+const playersMap: PlayersMap = new Map();
 
 export { PlayersMap, playersMap };

@@ -8,27 +8,12 @@ import { usersMap } from "../storages/usersMap";
 const handleUser: Handler<Credentials> = async (credentials, ws) => {
   const { name } = credentials;
   let index: number;
-  let response: string;
 
   try {
     if (await isUserRegistered(name)) {
       index = await loginUser(credentials);
-      const responseData: CreatedUser = {
-        name,
-        index,
-        error: false,
-        errorText: "",
-      };
-      response = createMessageStringified(MESSAGE_TYPE.REG, responseData);
     } else {
       index = await registerUser(credentials);
-      const responseData: CreatedUser = {
-        name,
-        index,
-        error: false,
-        errorText: "",
-      };
-      response = createMessageStringified(MESSAGE_TYPE.REG, responseData);
     }
   } catch (err) {
     const responseData: CreatedUser = {
@@ -37,13 +22,21 @@ const handleUser: Handler<Credentials> = async (credentials, ws) => {
       error: true,
       errorText: err.message,
     };
-    response = createMessageStringified(MESSAGE_TYPE.REG, responseData);
+    const response = createMessageStringified(MESSAGE_TYPE.REG, responseData);
     ws.send(response);
     logResponse(response);
     return;
   }
 
   playersMap.set(ws, index);
+
+  const responseData: CreatedUser = {
+    name,
+    index,
+    error: false,
+    errorText: "",
+  };
+  const response = createMessageStringified(MESSAGE_TYPE.REG, responseData);
 
   ws.send(response);
   logResponse(response);

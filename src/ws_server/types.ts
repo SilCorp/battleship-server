@@ -49,8 +49,6 @@ export interface Winner {
   wins: number;
 }
 
-export type Winners = Winner[];
-
 export interface IndexRoom {
   indexRoom: number;
 }
@@ -64,8 +62,6 @@ export interface Room {
   roomId: number;
   roomUsers: User[];
 }
-
-export type Rooms = Room[];
 
 export interface Position {
   x: number;
@@ -86,7 +82,7 @@ export interface Ship {
   type: SHIP_TYPE;
 }
 
-export interface GameBoard {
+export interface PlayerBoard {
   gameId: number;
   ships: Ship[];
   indexPlayer: number;
@@ -127,5 +123,7 @@ export interface Finish {
 export type Handler<T> = (
   data: T,
   ws: WebSocket,
-  clients: Set<WebSocket>,
+  clients: Clients,
 ) => void | Promise<void>;
+
+export type Clients = Set<WebSocket>;
